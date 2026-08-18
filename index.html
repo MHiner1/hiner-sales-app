@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2C474A">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Hiner Field Photos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,106 +15,61 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
-    --teal:#2C474A;
-    --teal-deep:#233A3D;
-    --teal-panel:#31504F;
-    --sage:#859981;
-    --bronze:#947056;
-    --bronze-light:#A57C60;
-    --bronze-dark:#6C533F;
-    --limestone:#DCD6C9;
-    --limestone-dim:rgba(220,214,201,.62);
-    --limestone-faint:rgba(220,214,201,.30);
+    --teal:#2C474A; --teal-deep:#233A3D; --teal-panel:#31504F;
+    --sage:#859981; --bronze:#947056; --bronze-light:#A57C60; --bronze-dark:#6C533F;
+    --limestone:#DCD6C9; --limestone-dim:rgba(220,214,201,.62); --limestone-faint:rgba(220,214,201,.30);
     --line:rgba(220,214,201,.14);
-    --ok:#9DB894;
     --grad:linear-gradient(115deg,#A57C60 0%,#6C533F 100%);
     --radius:14px;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
-  body{
-    background:var(--teal-deep);
-    color:var(--limestone);
-    font-family:'Josefin Sans',system-ui,sans-serif;
-    font-weight:300;
-    letter-spacing:.01em;
-    -webkit-font-smoothing:antialiased;
-  }
+  body{background:var(--teal-deep);color:var(--limestone);font-family:'Josefin Sans',system-ui,sans-serif;font-weight:300;letter-spacing:.01em;-webkit-font-smoothing:antialiased}
   #app{max-width:440px;margin:0 auto;min-height:100dvh;background:var(--teal);display:flex;flex-direction:column;position:relative;overflow-x:hidden}
 
-  /* ---------- shared ---------- */
   .screen{display:none;flex:1;flex-direction:column;animation:fade .25s ease}
   .screen.active{display:flex}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.screen{animation:none}}
 
-  .topbar{
-    padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 14px;
-    display:flex;align-items:center;gap:12px;
-    border-bottom:1px solid var(--line);
-    background:var(--teal);
-    position:sticky;top:0;z-index:5;
-  }
-  .back{
-    background:none;border:1px solid var(--line);color:var(--limestone);
-    width:38px;height:38px;border-radius:50%;font-size:18px;line-height:1;
-    display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;
-  }
-  .topbar h1{
-    font-size:13px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;flex:1;
-  }
+  .topbar{padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);background:var(--teal);position:sticky;top:0;z-index:5}
+  .back{background:none;border:1px solid var(--line);color:var(--limestone);width:38px;height:38px;border-radius:50%;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
+  .topbar h1{font-size:13px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;flex:1}
   .topbar .count{font-size:12px;letter-spacing:.12em;color:var(--bronze-light);font-weight:500}
 
   .body{padding:20px;flex:1;display:flex;flex-direction:column;gap:16px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 110px)}
 
-  .btn{
-    display:flex;align-items:center;justify-content:center;gap:10px;
-    width:100%;padding:17px 20px;border-radius:var(--radius);
-    font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;
-    letter-spacing:.22em;text-transform:uppercase;cursor:pointer;border:none;
-  }
+  .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:17px 20px;border-radius:var(--radius);font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;border:none}
   .btn-bronze{background:var(--grad);color:#fff}
   .btn-ghost{background:none;border:1px solid var(--limestone-faint);color:var(--limestone)}
   .btn:disabled{opacity:.4}
   .btn:active{transform:scale(.985)}
 
   .serif{font-family:'Crimson Text',serif;font-weight:400}
-  .note{
-    font-family:'Crimson Text',serif;font-style:italic;font-size:17px;line-height:1.5;
-    color:var(--limestone-dim);
-  }
+  .note{font-family:'Crimson Text',serif;font-style:italic;font-size:17px;line-height:1.5;color:var(--limestone-dim)}
 
-  .sticky-cta{
-    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-    width:100%;max-width:440px;padding:14px 20px calc(env(safe-area-inset-bottom,0px) + 16px);
-    background:linear-gradient(to top,var(--teal) 65%,rgba(44,71,74,0));
-    z-index:6;
-  }
+  .sticky-cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:440px;padding:14px 20px calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(to top,var(--teal) 65%,rgba(44,71,74,0));z-index:6}
 
-  /* ---------- leaf mark ---------- */
-  .leaf{display:block}
-  .leaf .fillbase{fill:rgba(220,214,201,.13)}
-
-  /* ---------- setup ---------- */
-  #setup .body{justify-content:flex-start;gap:0;padding-top:12vh}
-  .brand{display:flex;flex-direction:column;align-items:center;gap:18px;margin-bottom:44px}
+  /* setup */
+  #setup .body{justify-content:flex-start;gap:0;padding-top:9vh}
+  .brand{display:flex;flex-direction:column;align-items:center;gap:18px;margin-bottom:38px}
   .wordmark{font-size:26px;font-weight:600;letter-spacing:.42em;text-indent:.42em}
   .wordmark small{display:block;font-size:9.5px;font-weight:400;letter-spacing:.5em;text-indent:.5em;color:var(--limestone-dim);margin-top:7px}
-  .apptag{
-    font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--bronze-light);
-    border:1px solid rgba(165,124,96,.45);padding:8px 16px 6px;border-radius:99px;font-weight:500;
-  }
+  .apptag{font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--bronze-light);border:1px solid rgba(165,124,96,.45);padding:8px 16px 6px;border-radius:99px;font-weight:500}
   .field{margin-bottom:16px}
   .field label{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--limestone-dim);margin-bottom:9px;font-weight:500}
-  .field input{
-    width:100%;padding:16px;border-radius:var(--radius);border:1px solid var(--line);
-    background:var(--teal-panel);color:var(--limestone);
-    font-family:'Crimson Text',serif;font-size:19px;outline:none;
-  }
+  .field input{width:100%;padding:16px;border-radius:var(--radius);border:1px solid var(--line);background:var(--teal-panel);color:var(--limestone);font-family:'Crimson Text',serif;font-size:19px;outline:none}
   .field input:focus{border-color:var(--bronze-light)}
   .setup-note{margin-top:22px;text-align:center;font-size:15px}
+  .resume-card{background:var(--teal-panel);border:1px solid rgba(165,124,96,.5);border-radius:var(--radius);padding:16px;margin-bottom:26px;display:none}
+  .resume-card.show{display:block}
+  .resume-card .rc-t{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--bronze-light);font-weight:600;margin-bottom:8px}
+  .resume-card .rc-c{font-family:'Crimson Text',serif;font-size:20px;margin-bottom:2px}
+  .resume-card .rc-s{font-size:12px;color:var(--limestone-dim);letter-spacing:.08em;margin-bottom:14px}
+  .offline-pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:30;background:var(--bronze-dark);color:#fff;font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:6px 11px 5px;border-radius:99px;display:none}
+  .offline-pill.show{display:block}
 
-  /* ---------- home ---------- */
+  /* home */
   .home-head{display:flex;align-items:center;gap:16px;padding:6px 2px 2px}
   .home-head .job{flex:1;min-width:0}
   .home-head .job .client{font-family:'Crimson Text',serif;font-size:23px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -119,43 +77,31 @@
   .progress-line{display:flex;align-items:baseline;gap:8px;padding:0 2px}
   .progress-line b{font-size:30px;font-weight:500;color:var(--bronze-light)}
   .progress-line span{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--limestone-dim)}
+  .saved-note{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--sage);padding:0 2px;font-weight:500}
 
-  .cat{
-    display:flex;align-items:center;gap:14px;width:100%;text-align:left;
-    background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);
-    padding:16px;cursor:pointer;color:var(--limestone);font-family:inherit;
-  }
+  .cat{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;cursor:pointer;color:var(--limestone);font-family:inherit}
   .cat.done{border-color:rgba(133,153,129,.55)}
-  .cat .num{
-    width:34px;height:34px;border-radius:50%;flex:none;
-    display:flex;align-items:center;justify-content:center;
-    border:1px solid var(--limestone-faint);font-size:12px;font-weight:600;letter-spacing:.05em;
-  }
+  .cat .num{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--limestone-faint);font-size:12px;font-weight:600;letter-spacing:.05em}
   .cat.done .num{background:var(--sage);border-color:var(--sage);color:var(--teal-deep)}
   .cat .txt{flex:1;min-width:0}
   .cat .txt .t{font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
   .cat .txt .s{font-size:12px;color:var(--limestone-dim);margin-top:4px;letter-spacing:.04em}
   .cat .pics{font-size:12px;color:var(--bronze-light);font-weight:500;letter-spacing:.08em;flex:none}
 
-  .quality{
-    border:1px dashed rgba(165,124,96,.5);border-radius:var(--radius);padding:14px 16px;
-    font-size:12.5px;line-height:1.7;color:var(--limestone-dim);letter-spacing:.05em;
-  }
+  .quality{border:1px dashed rgba(165,124,96,.5);border-radius:var(--radius);padding:14px 16px;font-size:12.5px;line-height:1.7;color:var(--limestone-dim);letter-spacing:.05em}
   .quality b{color:var(--bronze-light);font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:10.5px;display:block;margin-bottom:5px}
 
-  /* ---------- category ---------- */
+  /* category */
   .cat-note{padding:2px 2px 6px}
-  .shot{
-    background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);
-    padding:15px;display:flex;flex-direction:column;gap:12px;
-  }
+  .lot-map{background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+  .lot-map .lm-t{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--bronze-light);font-weight:600;margin-bottom:10px;text-align:center}
+  .lot-map svg{display:block;width:100%;height:auto}
+
+  .shot{background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px;display:flex;flex-direction:column;gap:12px}
   .shot.satisfied{border-color:rgba(133,153,129,.55)}
   .shot.na{opacity:.55}
   .shot-head{display:flex;align-items:flex-start;gap:12px}
-  .shot-head .check{
-    width:24px;height:24px;border-radius:50%;border:1.5px solid var(--limestone-faint);
-    flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;
-  }
+  .shot-head .check{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--limestone-faint);flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px}
   .shot.satisfied .shot-head .check{background:var(--sage);border-color:var(--sage);color:var(--teal-deep)}
   .shot-head .txt{flex:1;min-width:0}
   .shot-head .t{font-size:14.5px;font-weight:500;letter-spacing:.06em;line-height:1.35}
@@ -165,23 +111,12 @@
   .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .thumb{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:var(--teal-deep)}
   .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .thumb .del{
-    position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;
-    background:rgba(35,58,61,.85);color:var(--limestone);border:none;font-size:13px;cursor:pointer;
-  }
-  .thumb .cap-flag{
-    position:absolute;left:0;right:0;bottom:0;padding:3px 6px;font-size:9px;letter-spacing:.1em;
-    background:rgba(35,58,61,.85);color:var(--bronze-light);text-transform:uppercase;font-weight:600;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
+  .thumb .del{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;background:rgba(35,58,61,.85);color:var(--limestone);border:none;font-size:13px;cursor:pointer}
+  .thumb .cap-flag{position:absolute;left:0;right:0;bottom:0;padding:3px 6px;font-size:9px;letter-spacing:.1em;background:rgba(35,58,61,.85);color:var(--bronze-light);text-transform:uppercase;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .thumb .cap-flag.has{color:var(--limestone)}
 
   .shot-actions{display:flex;gap:10px}
-  .shot-btn{
-    flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
-    padding:13px;border-radius:11px;font-family:inherit;font-size:11.5px;font-weight:600;
-    letter-spacing:.18em;text-transform:uppercase;cursor:pointer;
-  }
+  .shot-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:11px;font-family:inherit;font-size:11.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
   .shot-btn.cam{background:var(--grad);border:none;color:#fff}
   .shot-btn.na-btn{background:none;border:1px solid var(--line);color:var(--limestone-dim);flex:0 0 auto;padding:13px 16px}
   .shot.na .shot-btn.na-btn{border-color:var(--sage);color:var(--sage)}
@@ -189,69 +124,41 @@
   /* caption sheet */
   .sheet-scrim{position:fixed;inset:0;background:rgba(20,32,34,.7);z-index:20;display:none;align-items:flex-end;justify-content:center}
   .sheet-scrim.open{display:flex}
-  .sheet{
-    width:100%;max-width:440px;background:var(--teal);border-radius:20px 20px 0 0;
-    padding:22px 20px calc(env(safe-area-inset-bottom,0px) + 22px);
-    display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);
-  }
+  .sheet{width:100%;max-width:440px;background:var(--teal);border-radius:20px 20px 0 0;padding:22px 20px calc(env(safe-area-inset-bottom,0px) + 22px);display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line)}
   .sheet h3{font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:600}
-  .sheet img{width:100%;border-radius:12px;max-height:38vh;object-fit:cover}
-  .sheet input{
-    width:100%;padding:15px;border-radius:12px;border:1px solid var(--line);
-    background:var(--teal-panel);color:var(--limestone);
-    font-family:'Crimson Text',serif;font-size:18px;outline:none;
-  }
+  .sheet img{width:100%;border-radius:12px;max-height:34vh;object-fit:cover}
+  .sheet input{width:100%;padding:15px;border-radius:12px;border:1px solid var(--line);background:var(--teal-panel);color:var(--limestone);font-family:'Crimson Text',serif;font-size:18px;outline:none}
   .sheet .note{font-size:15px}
 
-  /* ---------- test / export ---------- */
-  .test-quote{
-    font-family:'Crimson Text',serif;font-size:24px;line-height:1.45;text-align:center;
-    padding:10px 8px;
-  }
+  /* test / export */
+  .test-quote{font-family:'Crimson Text',serif;font-size:24px;line-height:1.45;text-align:center;padding:10px 8px}
   .test-quote .em{color:var(--bronze-light)}
   .rule{height:1px;background:var(--line);margin:6px 30%}
-  .warnbox{
-    border:1px solid rgba(165,124,96,.5);border-radius:var(--radius);padding:15px 16px;
-    font-size:13px;line-height:1.7;color:var(--limestone-dim);letter-spacing:.04em;
-  }
+  .warnbox{border:1px solid rgba(165,124,96,.5);border-radius:var(--radius);padding:15px 16px;font-size:13px;line-height:1.7;color:var(--limestone-dim);letter-spacing:.04em}
   .warnbox b{color:var(--bronze-light)}
   .export-stat{display:flex;justify-content:space-between;padding:13px 2px;border-bottom:1px solid var(--line);font-size:13px;letter-spacing:.08em}
   .export-stat span:last-child{color:var(--bronze-light);font-weight:600}
-  .toast{
-    position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 120px);
-    background:var(--limestone);color:var(--teal-deep);padding:12px 20px;border-radius:99px;
-    font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;z-index:40;
-    opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;
-  }
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 120px);background:var(--limestone);color:var(--teal-deep);padding:12px 20px;border-radius:99px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;z-index:40;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
   .toast.show{opacity:1}
   .hidden-input{display:none}
 </style>
 </head>
 <body>
 <div id="app">
+  <div class="offline-pill" id="offline-pill">Offline — photos saving to phone</div>
 
   <!-- SETUP -->
   <section class="screen active" id="setup">
     <div class="body">
       <div class="brand">
-        <svg class="leaf" width="64" height="80" viewBox="0 0 64 80">
-          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#A57C60"/><stop offset="1" stop-color="#6C533F"/>
-          </linearGradient></defs>
-          <path fill="url(#lg)" d="M32 0C32 0 2 26 2 50a30 30 0 0 0 60 0C62 26 32 0 32 0Zm2 70V16l0 0v54h-4V16c-1 1-2 2-3 3v14l-11-6 0 5 11 6v10l-11-6v5l11 6v13h10V57l11-6v-5l-11 6V42l11-6v-5l-11 6V20c-1-1-2-2-3-3Z" fill-rule="evenodd" clip-rule="evenodd" opacity="0"/>
-          <path fill="url(#lg)" d="M32 1C20 13 4 31 4 50a28 28 0 0 0 56 0C60 31 44 13 32 1Z"/>
-          <g stroke="#2C474A" stroke-width="4" fill="none">
-            <line x1="32" y1="14" x2="32" y2="74"/>
-            <line x1="32" y1="30" x2="18" y2="24"/>
-            <line x1="32" y1="42" x2="18" y2="36"/>
-            <line x1="32" y1="54" x2="18" y2="48"/>
-            <line x1="32" y1="36" x2="46" y2="30"/>
-            <line x1="32" y1="48" x2="46" y2="42"/>
-            <line x1="32" y1="60" x2="46" y2="54"/>
-          </g>
-        </svg>
-        <div class="wordmark">HINER<small>OUTDOOR LIVING</small></div>
+        <img src="logo-full.png" alt="Hiner Outdoor Living" style="width:200px;height:auto">
         <div class="apptag">Field Verification Photos</div>
+      </div>
+      <div class="resume-card" id="resume-card">
+        <div class="rc-t">Job in progress on this phone</div>
+        <div class="rc-c serif" id="rc-client"></div>
+        <div class="rc-s" id="rc-stats"></div>
+        <button class="btn btn-bronze" id="btn-resume" style="padding:14px">Resume this job</button>
       </div>
       <div class="field">
         <label>Client name</label>
@@ -269,7 +176,7 @@
   <!-- HOME -->
   <section class="screen" id="home">
     <div class="topbar">
-      <svg class="leaf" width="26" height="32" viewBox="0 0 64 80"><path fill="url(#lg)" d="M32 1C20 13 4 31 4 50a28 28 0 0 0 56 0C60 31 44 13 32 1Z"/><g stroke="#2C474A" stroke-width="4" fill="none"><line x1="32" y1="14" x2="32" y2="74"/><line x1="32" y1="30" x2="18" y2="24"/><line x1="32" y1="42" x2="18" y2="36"/><line x1="32" y1="54" x2="18" y2="48"/><line x1="32" y1="36" x2="46" y2="30"/><line x1="32" y1="48" x2="46" y2="42"/><line x1="32" y1="60" x2="46" y2="54"/></g></svg>
+      <img src="leaf.png" alt="" style="width:24px;height:auto">
       <h1>Shot List</h1>
       <span class="count" id="home-count">0 photos</span>
     </div>
@@ -281,6 +188,7 @@
         </div>
       </div>
       <div class="progress-line"><b id="home-pct">0%</b><span>of shot list covered</span></div>
+      <div class="saved-note">✓ Every photo saves to this phone instantly — no signal needed</div>
       <div id="cat-list"></div>
       <div class="quality"><b>Every shot</b>Daylight. Landscape orientation. No fingers or shadows over the frame.</div>
     </div>
@@ -296,6 +204,7 @@
     </div>
     <div class="body">
       <p class="note cat-note" id="cat-desc"></p>
+      <div id="cat-map"></div>
       <div id="shot-list"></div>
     </div>
     <div class="sticky-cta"><button class="btn btn-ghost" id="cat-done">Back to shot list</button></div>
@@ -331,11 +240,12 @@
         <div class="export-stat"><span>Photos captured</span><span id="ex-count"></span></div>
         <div class="export-stat"><span>Shot list coverage</span><span id="ex-pct"></span></div>
       </div>
-      <p class="note">Every photo is renamed with the client, category, and your label — so the file itself says what it is, exactly like the SOP asks.</p>
+      <p class="note">Filenames stay short. Your labels, the shot name, the client, date, and GPS get stamped in a strip on the photo itself — the designer reads it right on the image.</p>
       <button class="btn btn-bronze" id="btn-share">Send to Dropbox — 03 Photos</button>
       <button class="btn btn-ghost" id="btn-zip">Download as ZIP instead</button>
-      <div class="warnbox"><b>How the Dropbox step works:</b> "Send to Dropbox" opens your phone's share sheet. Choose the Dropbox app, then pick the job folder → 03 Photos. Filenames carry the labels, so nothing gets lost in translation.</div>
+      <div class="warnbox"><b>How it works:</b> "Send to Dropbox" opens the share sheet. Pick the Dropbox app, then the job folder → 03 Photos. No signal? Photos are safe on this phone — come back to this screen when you're in service.</div>
       <div class="warnbox">Upload <b>same-day</b>. Phone camera rolls are not a filing system.</div>
+      <button class="btn btn-ghost" id="btn-clear" style="border-color:rgba(165,124,96,.5);color:var(--bronze-light)">Uploaded &amp; verified — clear this job</button>
     </div>
   </section>
 
@@ -344,7 +254,7 @@
     <div class="sheet">
       <h3>Label this photo</h3>
       <img id="sheet-img" alt="Captured photo">
-      <input id="sheet-cap" type="text" placeholder="e.g. Valve box, NE corner — or gate width 46 in" autocomplete="off">
+      <input id="sheet-cap" type="text" placeholder="e.g. Valve box, NE corner" autocomplete="off">
       <p class="note" id="sheet-hint">A photo of a valve box needs a label that says so.</p>
       <button class="btn btn-bronze" id="sheet-save">Save label</button>
       <button class="btn btn-ghost" id="sheet-skip">It's obvious — skip</button>
@@ -356,85 +266,156 @@
 </div>
 
 <script>
-/* ================= DATA ================= */
+/* ================= SHOT LIST DATA ================= */
 const CATEGORIES = [
   {
-    id:'wide', num:'01', title:'Wide Establishing',
-    desc:'Every side of the work area, plus the one that matters most.',
+    id:'wide', num:'01', title:'Perimeter Walk',
+    desc:'Nine minimum positions. Corners shoot down both property lines and across at the house. Mid-line positions shoot both ways down the line, plus at the house.',
+    map:true,
     shots:[
-      {id:'wide-sides', t:'Work area — every side, multiple angles', tip:'Walk the perimeter. Shoot it from each side before you shoot anything else.', min:4, na:false, labelHint:'e.g. Backyard from SW corner'},
-      {id:'wide-house', t:'The view from the house, looking out', tip:'That\u2019s the view the client buys.', min:1, na:false, labelHint:'e.g. From kitchen slider'},
+      {id:'p1', t:'Position 1 — front corner, driveway side (start here)', tip:'Down each property line, then across the lot at the house.', min:3, na:false, hint:'e.g. From SE corner'},
+      {id:'p2', t:'Position 2 — mid side line', tip:'Both directions along the line, plus straight at the house.', min:3, na:false, hint:''},
+      {id:'p3', t:'Position 3 — back corner', tip:'Down each property line, then across at the house.', min:3, na:false, hint:''},
+      {id:'p4', t:'Position 4 — mid back line', tip:'Both directions along the back line, plus at the rear of the house.', min:3, na:false, hint:''},
+      {id:'p5', t:'Position 5 — back corner, opposite side', tip:'Down each property line, then across at the house.', min:3, na:false, hint:''},
+      {id:'p6', t:'Position 6 — mid side line, opposite side', tip:'Both directions along the line, plus straight at the house.', min:3, na:false, hint:''},
+      {id:'p7', t:'Position 7 — front corner, opposite side', tip:'Down each property line, then across at the house.', min:3, na:false, hint:''},
+      {id:'p8', t:'Position 8 — mid front line', tip:'Both directions along the front, plus at the front of the house.', min:3, na:false, hint:''},
+      {id:'p9', t:'Position 9 — tight zone behind the house', tip:'Stand between the house and anything behind it. Shoot the gap.', min:1, na:true, hint:'e.g. Between house and shed'},
+      {id:'p10', t:'The view from the house, looking out', tip:'That\u2019s the view the client buys.', min:1, na:false, hint:'e.g. From kitchen slider'},
     ]
   },
   {
     id:'util', num:'02', title:'Utilities',
     desc:'Everything a crew will hit, trench near, or tie into. Photograph it or mark it not on property.',
     shots:[
-      {id:'u-gas', t:'Gas meter', min:1, na:true, labelHint:'Location if not obvious'},
-      {id:'u-elec', t:'Electric meter', min:1, na:true, labelHint:'Location if not obvious'},
-      {id:'u-ac', t:'AC units', min:1, na:true, labelHint:''},
-      {id:'u-spigot', t:'Spigots', min:1, na:true, labelHint:'e.g. Spigot, west wall'},
-      {id:'u-irr', t:'Irrigation heads & valve boxes', tip:'A photo of a valve box needs a label that says so.', min:1, na:true, labelHint:'e.g. Valve box, NE bed'},
-      {id:'u-septic', t:'Septic components', min:1, na:true, labelHint:''},
-      {id:'u-well', t:'Well head', min:1, na:true, labelHint:''},
-      {id:'u-marks', t:'Utility markers or flags', min:1, na:true, labelHint:'e.g. Blue flags along fence'},
+      {id:'u-gas', t:'Gas meter', min:1, na:true, hint:'Location if not obvious'},
+      {id:'u-elec', t:'Electric meter', min:1, na:true, hint:'Location if not obvious'},
+      {id:'u-panel', t:'Electrical panel', tip:'Main panel and any sub-panels. Label where each one is.', min:1, na:true, hint:'e.g. Main panel, garage west wall'},
+      {id:'u-outlet', t:'Exterior outlets', tip:'Every outlet on the facades facing the work area.', min:1, na:true, hint:'e.g. Outlet, back patio wall'},
+      {id:'u-ac', t:'AC units', min:1, na:true, hint:''},
+      {id:'u-spigot', t:'Spigots', min:1, na:true, hint:'e.g. Spigot, west wall'},
+      {id:'u-irr-man', t:'Irrigation — manifold location', tip:'Wide shot showing where it sits on the property.', min:1, na:true, hint:'e.g. Manifold, NE bed by fence'},
+      {id:'u-irr-in', t:'Irrigation — inside the manifold', tip:'Lid off. Straight down.', min:1, na:true, hint:''},
+      {id:'u-irr-poc', t:'Irrigation — point of connection (POC)', min:1, na:true, hint:'e.g. POC at basement wall'},
+      {id:'u-irr-timer', t:'Irrigation timer / controller', tip:'Label where it lives.', min:1, na:true, hint:'e.g. Timer, garage interior'},
+      {id:'u-septic', t:'Septic components', min:1, na:true, hint:''},
+      {id:'u-well', t:'Well head', min:1, na:true, hint:''},
+      {id:'u-marks', t:'Utility markers or flags', min:1, na:true, hint:'e.g. Blue flags along fence'},
     ]
   },
   {
     id:'exist', num:'03', title:'Existing Features',
     desc:'Anything staying, going, or being worked around.',
     shots:[
-      {id:'e-patio', t:'Patios & decks', min:1, na:true, labelHint:''},
-      {id:'e-struct', t:'Structures', min:1, na:true, labelHint:'e.g. Shed, NW corner'},
-      {id:'e-trees', t:'Trees & significant plantings', min:1, na:true, labelHint:''},
-      {id:'e-walls', t:'Walls', min:1, na:true, labelHint:''},
-      {id:'e-water', t:'Water features', min:1, na:true, labelHint:''},
-      {id:'e-other', t:'Anything else staying, going, or in the way', min:1, na:true, labelHint:'Say what it is'},
+      {id:'e-patio', t:'Patios & decks', min:1, na:true, hint:''},
+      {id:'e-struct', t:'Structures', min:1, na:true, hint:'e.g. Shed, NW corner'},
+      {id:'e-trees', t:'Trees & significant plantings', min:1, na:true, hint:''},
+      {id:'e-walls', t:'Walls', min:1, na:true, hint:''},
+      {id:'e-water', t:'Water features', min:1, na:true, hint:''},
+      {id:'e-other', t:'Anything else staying, going, or in the way', min:1, na:true, hint:'Say what it is'},
     ]
   },
   {
     id:'access', num:'04', title:'Access Points',
     desc:'How the equipment gets from the street to the work area.',
     shots:[
-      {id:'a-gates', t:'Gates — with widths', tip:'Measure it. Put the width in the label.', min:1, na:true, labelHint:'e.g. Gate width 46 in'},
-      {id:'a-side', t:'Side yards', min:1, na:true, labelHint:''},
-      {id:'a-path', t:'Equipment path, street to work area', min:1, na:false, labelHint:''},
-      {id:'a-pinch', t:'The tightest pinch point', tip:'The one spot that decides what machine fits.', min:1, na:false, labelHint:'e.g. 38 in between house and fence'},
+      {id:'a-gates', t:'Gates — with widths', tip:'Measure it. Put the width in the label.', min:1, na:true, hint:'e.g. Gate width 46 in'},
+      {id:'a-side', t:'Side yards', min:1, na:true, hint:''},
+      {id:'a-path', t:'Equipment path, street to work area', min:1, na:false, hint:''},
+      {id:'a-pinch', t:'The tightest pinch point', tip:'The one spot that decides what machine fits.', min:1, na:false, hint:'e.g. 38 in between house and fence'},
     ]
   },
   {
     id:'drain', num:'05', title:'Drainage & Problem Areas',
     desc:'If it made you pause on site, it goes in the folder.',
     shots:[
-      {id:'d-spouts', t:'Downspouts', min:1, na:true, labelHint:''},
-      {id:'d-erosion', t:'Erosion or pooling', min:1, na:true, labelHint:'Where and when it pools, if known'},
-      {id:'d-pause', t:'Anything that made you pause', min:1, na:true, labelHint:'Say why it made you pause'},
+      {id:'d-spouts', t:'Downspouts', min:1, na:true, hint:''},
+      {id:'d-erosion', t:'Erosion or pooling', min:1, na:true, hint:'Where and when it pools, if known'},
+      {id:'d-pause', t:'Anything that made you pause', min:1, na:true, hint:'Say why it made you pause'},
+      {id:'d-damage', t:'Existing damage — before we touch anything', tip:'Dented downspouts, cracked or broken concrete, siding dings, fence damage. If we could get blamed for it later, it gets photographed now.', min:1, na:true, hint:'e.g. Cracked driveway slab, pre-existing'},
     ]
   },
   {
     id:'house', num:'06', title:'The House Itself',
-    desc:'Material and color context for the design.',
+    desc:'Material and color context. The designer matches every finish to these.',
     shots:[
-      {id:'h-facade', t:'Elevation shots — facades facing the work area', tip:'Straight-on, full facade. The designer matches stone and siding to this.', min:2, na:false, labelHint:'e.g. South facade'},
+      {id:'h-facade', t:'Elevations — facades facing the work area', tip:'Straight-on, full facade.', min:2, na:false, hint:'e.g. South facade'},
+      {id:'h-siding', t:'Siding — close-up', tip:'Close enough to read texture and true color.', min:1, na:false, hint:'e.g. Lap siding, sage green'},
+      {id:'h-stone', t:'Stone / masonry accents — close-up', min:1, na:true, hint:'e.g. Ledgestone, entry column'},
+      {id:'h-wood', t:'Wood & trim — close-up', min:1, na:true, hint:'e.g. Cedar beams, patio cover'},
+      {id:'h-other', t:'Other finishes — metal, roofline, paint colors', tip:'Anything the design should match or tie into.', min:1, na:true, hint:''},
     ]
   },
 ];
 
-/* ================= STATE ================= */
-const state = {
-  client:'', addr:'',
-  photos:{},   // shotId -> [{file, url, caption}]
-  naFlags:{},  // shotId -> true
-};
-let activeCat = null;
-let pendingShot = null;
-let captionQueue = [];
+/* ================= LOT MAP SVG ================= */
+const LOT_MAP = `
+<svg viewBox="0 0 340 300">
+  <rect x="30" y="20" width="280" height="250" fill="none" stroke="rgba(220,214,201,.35)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="105" y="105" width="150" height="80" fill="rgba(220,214,201,.10)" stroke="rgba(220,214,201,.4)" stroke-width="1.5"/>
+  <text x="180" y="151" text-anchor="middle" fill="rgba(220,214,201,.65)" font-size="12" letter-spacing="2" font-family="Josefin Sans,sans-serif">HOUSE</text>
+  <rect x="195" y="185" width="42" height="85" fill="rgba(220,214,201,.06)" stroke="rgba(220,214,201,.25)" stroke-width="1"/>
+  <text x="216" y="240" text-anchor="middle" fill="rgba(220,214,201,.45)" font-size="8" letter-spacing="1.5" font-family="Josefin Sans,sans-serif" transform="rotate(-90 216 235)">DRIVEWAY</text>
+  <rect x="222" y="72" width="30" height="26" fill="none" stroke="rgba(220,214,201,.25)" stroke-width="1"/>
+  ${[
+    [285,255,'1'],[295,145,'2'],[295,35,'3'],[170,28,'4'],[42,35,'5'],[42,145,'6'],[42,255,'7'],[150,262,'8'],[236,92,'9']
+  ].map(([x,y,n])=>`
+    <circle cx="${x}" cy="${y}" r="12" fill="#A57C60"/>
+    <text x="${x}" y="${y+4}" text-anchor="middle" fill="#fff" font-size="11" font-weight="600" font-family="Josefin Sans,sans-serif">${n}</text>`).join('')}
+  <text x="285" y="288" text-anchor="middle" fill="rgba(165,124,96,.9)" font-size="8.5" letter-spacing="1.5" font-family="Josefin Sans,sans-serif">START</text>
+</svg>`;
 
+/* ================= STATE + INDEXEDDB ================= */
+const state = { client:'', addr:'', photos:{}, naFlags:{} }; // photos: shotId -> [{dbId, blob, url, caption, gps, ts}]
+let db;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const req = indexedDB.open('hiner-field', 1);
+    req.onupgradeneeded = e=>{
+      const d = e.target.result;
+      d.createObjectStore('meta');
+      d.createObjectStore('photos',{keyPath:'id',autoIncrement:true});
+    };
+    req.onsuccess = e=>{ db=e.target.result; res(); };
+    req.onerror = ()=>rej(req.error);
+  });
+}
+const tx = (store,mode)=>db.transaction(store,mode).objectStore(store);
+const idb = {
+  putMeta:(k,v)=>new Promise(r=>{ tx('meta','readwrite').put(v,k).onsuccess=r; }),
+  getMeta:k=>new Promise(r=>{ const q=tx('meta','readonly').get(k); q.onsuccess=()=>r(q.result); }),
+  addPhoto:rec=>new Promise(r=>{ const q=tx('photos','readwrite').add(rec); q.onsuccess=()=>r(q.result); }),
+  updPhoto:rec=>new Promise(r=>{ tx('photos','readwrite').put(rec).onsuccess=r; }),
+  delPhoto:id=>new Promise(r=>{ tx('photos','readwrite').delete(id).onsuccess=r; }),
+  allPhotos:()=>new Promise(r=>{ const q=tx('photos','readonly').getAll(); q.onsuccess=()=>r(q.result||[]); }),
+  clearAll:()=>new Promise(r=>{ const t=db.transaction(['meta','photos'],'readwrite'); t.objectStore('meta').clear(); t.objectStore('photos').clear(); t.oncomplete=r; }),
+};
+async function saveSessionMeta(){
+  await idb.putMeta('session',{client:state.client,addr:state.addr,naFlags:state.naFlags,started:Date.now()});
+}
+
+/* ================= HELPERS ================= */
 const $ = id => document.getElementById(id);
 const screens = ['setup','home','category','test','export'];
 function show(id){ screens.forEach(s=>$(s).classList.toggle('active', s===id)); window.scrollTo(0,0); }
-function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function toast(msg,ms){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),ms||2200); }
 const sanitize = s => (s||'').trim().replace(/[^\w\- ]+/g,'').replace(/\s+/g,'-') || 'Job';
+function findShot(id){ for(const c of CATEGORIES){ const s=c.shots.find(x=>x.id===id); if(s) return {shot:s,cat:c}; } }
+
+/* GPS — works off the GPS chip, no cell service needed */
+let lastGPS = null;
+function grabGPS(){
+  if(!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    p=>{ lastGPS = {lat:+p.coords.latitude.toFixed(6), lng:+p.coords.longitude.toFixed(6)}; },
+    ()=>{}, {enableHighAccuracy:true, timeout:6000, maximumAge:120000}
+  );
+}
+
+/* offline pill */
+function netStatus(){ $('offline-pill').classList.toggle('show', !navigator.onLine); }
+window.addEventListener('online',netStatus); window.addEventListener('offline',netStatus);
 
 /* ================= PROGRESS ================= */
 function shotPhotos(id){ return state.photos[id]||[]; }
@@ -464,10 +445,7 @@ function renderHome(){
     el.className = 'cat'+(s.complete?' done':'');
     el.innerHTML = `
       <span class="num">${s.complete?'\u2713':cat.num}</span>
-      <span class="txt">
-        <span class="t">${cat.title}</span>
-        <span class="s">${s.done} of ${s.total} shots covered</span>
-      </span>
+      <span class="txt"><span class="t">${cat.title}</span><span class="s">${s.done} of ${s.total} shots covered</span></span>
       <span class="pics">${s.pics?s.pics+' \uD83D\uDCF7':''}</span>`;
     el.onclick = ()=>openCategory(cat.id);
     el.style.marginBottom='10px';
@@ -476,6 +454,7 @@ function renderHome(){
 }
 
 /* ================= RENDER: CATEGORY ================= */
+let activeCat = null;
 function openCategory(id){
   activeCat = CATEGORIES.find(c=>c.id===id);
   renderCategory();
@@ -485,6 +464,7 @@ function renderCategory(){
   const cat = activeCat;
   $('cat-title').textContent = cat.num+' \u2014 '+cat.title;
   $('cat-desc').textContent = cat.desc;
+  $('cat-map').innerHTML = cat.map ? `<div class="lot-map"><div class="lm-t">Minimum positions — adapt to the lot</div>${LOT_MAP}</div>` : '';
   const s = catStats(cat);
   $('cat-count').textContent = s.done+'/'+s.total;
   const list = $('shot-list'); list.innerHTML='';
@@ -520,19 +500,21 @@ function renderCategory(){
       </div>`;
     list.appendChild(div);
   });
-  // wire
   list.querySelectorAll('[data-cam]').forEach(b=>b.onclick=()=>startCapture(b.dataset.cam));
-  list.querySelectorAll('[data-na]').forEach(b=>b.onclick=()=>{
+  list.querySelectorAll('[data-na]').forEach(b=>b.onclick=async()=>{
     const id=b.dataset.na;
     if(shotPhotos(id).length){ toast('Delete photos first'); return; }
     state.naFlags[id]=!state.naFlags[id];
+    await saveSessionMeta();
     renderCategory();
   });
-  list.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
+  list.querySelectorAll('.del').forEach(b=>b.onclick=async()=>{
     const arr=state.photos[b.dataset.shot];
-    URL.revokeObjectURL(arr[b.dataset.i].url);
+    const rec=arr[b.dataset.i];
+    URL.revokeObjectURL(rec.url);
+    await idb.delPhoto(rec.dbId);
     arr.splice(b.dataset.i,1);
-    renderCategory();
+    renderCategory(); renderHome();
   });
   list.querySelectorAll('[data-cap-shot]').forEach(el=>el.onclick=()=>{
     openCaption(el.dataset.capShot, +el.dataset.capI);
@@ -540,26 +522,30 @@ function renderCategory(){
 }
 
 /* ================= CAPTURE ================= */
+let pendingShot = null;
+let captionQueue = [];
 function startCapture(shotId){
   pendingShot = shotId;
+  grabGPS();
   $('camera-input').value='';
   $('camera-input').click();
 }
-$('camera-input').addEventListener('change', e=>{
+$('camera-input').addEventListener('change', async e=>{
   const files=[...e.target.files];
   if(!files.length || !pendingShot) return;
   state.photos[pendingShot] = state.photos[pendingShot]||[];
   captionQueue = [];
-  files.forEach(f=>{
-    const rec = {file:f, url:URL.createObjectURL(f), caption:''};
-    state.photos[pendingShot].push(rec);
+  for(const f of files){
+    const rec = {shotId:pendingShot, blob:f, type:f.type||'image/jpeg', caption:'', gps:lastGPS, ts:Date.now()};
+    const dbId = await idb.addPhoto(rec);            // saved to phone storage immediately
+    const live = {dbId, blob:f, url:URL.createObjectURL(f), caption:'', gps:lastGPS, ts:rec.ts};
+    state.photos[pendingShot].push(live);
     captionQueue.push({shot:pendingShot, i:state.photos[pendingShot].length-1});
-  });
+  }
   renderCategory(); renderHome();
-  // prompt label for the first new photo (utilities/access matter most)
+  toast('Saved to phone \u2713');
   nextCaption();
 });
-function findShot(id){ for(const c of CATEGORIES){ const s=c.shots.find(x=>x.id===id); if(s) return s; } }
 function nextCaption(){
   const item = captionQueue.shift();
   if(!item) return;
@@ -571,41 +557,49 @@ function openCaption(shotId, i, fromQueue){
   capTarget = {shotId, i, fromQueue:!!fromQueue};
   $('sheet-img').src = p.url;
   $('sheet-cap').value = p.caption||'';
-  const shot = findShot(shotId);
-  $('sheet-cap').placeholder = shot.labelHint || 'What is this, and where?';
-  $('sheet-hint').textContent = shot.tip || 'Label what isn\u2019t obvious.';
+  const f = findShot(shotId);
+  $('sheet-cap').placeholder = f.shot.hint || 'What is this, and where?';
+  $('sheet-hint').textContent = f.shot.tip || 'Label what isn\u2019t obvious.';
   $('sheet-scrim').classList.add('open');
 }
-function closeCaption(){
+async function closeCaption(save){
+  if(save && capTarget){
+    const p = state.photos[capTarget.shotId][capTarget.i];
+    p.caption = $('sheet-cap').value.trim();
+    await idb.updPhoto({id:p.dbId, shotId:capTarget.shotId, blob:p.blob, type:p.blob.type||'image/jpeg', caption:p.caption, gps:p.gps, ts:p.ts});
+  }
   $('sheet-scrim').classList.remove('open');
   const fq = capTarget && capTarget.fromQueue;
   capTarget=null;
   renderCategory(); renderHome();
   if(fq) nextCaption();
 }
-$('sheet-save').onclick=()=>{
-  if(capTarget){ state.photos[capTarget.shotId][capTarget.i].caption = $('sheet-cap').value.trim(); }
-  closeCaption();
-};
-$('sheet-skip').onclick=closeCaption;
-$('sheet-scrim').onclick=e=>{ if(e.target===$('sheet-scrim')) closeCaption(); };
+$('sheet-save').onclick=()=>closeCaption(true);
+$('sheet-skip').onclick=()=>closeCaption(false);
+$('sheet-scrim').onclick=e=>{ if(e.target===$('sheet-scrim')) closeCaption(false); };
 
 /* ================= FLOW ================= */
-$('btn-start').onclick=()=>{
+$('btn-start').onclick=async()=>{
   const c=$('in-client').value.trim();
   if(!c){ toast('Client name first'); $('in-client').focus(); return; }
-  state.client=c; state.addr=$('in-addr').value.trim();
+  const existing = await idb.getMeta('session');
+  if(existing && (await idb.allPhotos()).length){
+    if(!confirm('Starting a new job deletes the unfinished job saved on this phone ('+existing.client+'). Upload that one first if it matters. Start new anyway?')) return;
+  }
+  await idb.clearAll();
+  state.client=c; state.addr=$('in-addr').value.trim(); state.photos={}; state.naFlags={};
+  await saveSessionMeta();
+  grabGPS();
   renderHome(); show('home');
 };
+$('btn-resume').onclick=async()=>{ await restoreSession(); show('home'); };
 $('cat-back').onclick=()=>{ renderHome(); show('home'); };
 $('cat-done').onclick=()=>{ renderHome(); show('home'); };
 $('btn-finish').onclick=()=>{
-  const t=totals();
   const gaps = [];
   CATEGORIES.forEach(c=>{ const s=catStats(c); if(!s.complete) gaps.push(c.num+' '+c.title+' \u2014 '+(s.total-s.done)+' shot'+(s.total-s.done===1?'':'s')+' open'); });
   $('test-gaps').innerHTML = gaps.length
-    ? '<div class="warnbox" style="margin-top:20px"><b>Still open:</b><br>'+gaps.join('<br>')+'</div>'
-    : '';
+    ? '<div class="warnbox" style="margin-top:20px"><b>Still open:</b><br>'+gaps.join('<br>')+'</div>' : '';
   show('test');
 };
 $('test-back').onclick=()=>show('home');
@@ -618,41 +612,97 @@ $('btn-pass').onclick=()=>{
   show('export');
 };
 $('export-back').onclick=()=>show('test');
+$('btn-clear').onclick=async()=>{
+  if(!confirm('Only clear after you\u2019ve confirmed the photos are in Dropbox. Clear this job from the phone?')) return;
+  await idb.clearAll();
+  Object.values(state.photos).flat().forEach(p=>URL.revokeObjectURL(p.url));
+  state.client=''; state.addr=''; state.photos={}; state.naFlags={};
+  $('in-client').value=''; $('in-addr').value='';
+  $('resume-card').classList.remove('show');
+  show('setup');
+  toast('Job cleared');
+};
 
-/* ================= EXPORT ================= */
-function buildFileList(){
-  const job = sanitize(state.client);
-  const out=[];
-  CATEGORIES.forEach(cat=>{
-    cat.shots.forEach(shot=>{
-      shotPhotos(shot.id).forEach((p,i)=>{
-        const ext = (p.file.name.match(/\.\w+$/)||['.jpg'])[0];
-        const cap = p.caption ? '_'+sanitize(p.caption) : '';
-        const name = `${job}_${cat.num}-${sanitize(shot.t).slice(0,32)}${cap}_${String(i+1).padStart(2,'0')}${ext}`;
-        out.push({name, file:p.file});
-      });
-    });
-  });
+/* ================= STAMP + EXPORT ================= */
+const MAX_EDGE = 2400;
+async function stampPhoto(p, shot, cat){
+  let bmp;
+  try{ bmp = await createImageBitmap(p.blob, {imageOrientation:'from-image'}); }
+  catch(e){ bmp = await createImageBitmap(p.blob); }
+  const scale = Math.min(1, MAX_EDGE/Math.max(bmp.width,bmp.height));
+  const w = Math.round(bmp.width*scale), h = Math.round(bmp.height*scale);
+  const barH = Math.max(72, Math.round(h*0.075));
+  const cv = document.createElement('canvas');
+  cv.width=w; cv.height=h+barH;
+  const ctx=cv.getContext('2d');
+  ctx.drawImage(bmp,0,0,w,h);
+  bmp.close && bmp.close();
+  ctx.fillStyle='#233A3D';
+  ctx.fillRect(0,h,w,barH);
+  const pad=Math.round(barH*0.28);
+  const f1=Math.round(barH*0.34), f2=Math.round(barH*0.24);
+  ctx.fillStyle='#DCD6C9';
+  ctx.font=`600 ${f1}px Josefin Sans, sans-serif`;
+  const line1 = (p.caption || shot.t);
+  ctx.fillText(line1, pad, h+pad+f1*0.85, w-pad*2);
+  ctx.fillStyle='rgba(220,214,201,.65)';
+  ctx.font=`400 ${f2}px Josefin Sans, sans-serif`;
+  const d = new Date(p.ts);
+  const gps = p.gps ? `${p.gps.lat}, ${p.gps.lng}` : 'GPS n/a';
+  const line2 = `${cat.num} ${cat.title}  \u2022  ${state.client}  \u2022  ${d.toLocaleDateString()} ${d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}  \u2022  ${gps}`;
+  ctx.fillText(line2, pad, h+barH-pad*0.55, w-pad*2);
+  return new Promise(r=>cv.toBlob(r,'image/jpeg',0.85));
+}
+async function buildStamped(progressCb){
+  const job = sanitize(state.client).slice(0,20);
+  const out=[]; let n=0;
+  const t=totals();
+  for(const cat of CATEGORIES){
+    let seq=0;
+    for(const shot of cat.shots){
+      for(const p of shotPhotos(shot.id)){
+        seq++; n++;
+        progressCb && progressCb(n, t.pics);
+        const blob = await stampPhoto(p, shot, cat);
+        out.push({name:`${job}_${cat.num}-${String(seq).padStart(2,'0')}.jpg`, blob,
+                  meta:{cat:cat.title, shot:shot.t, label:p.caption, gps:p.gps, ts:p.ts}});
+      }
+    }
+  }
   return out;
 }
 $('btn-share').onclick=async()=>{
-  const list=buildFileList();
-  if(!list.length){ toast('No photos yet'); return; }
-  const files=list.map(x=>new File([x.file], x.name, {type:x.file.type||'image/jpeg'}));
-  if(navigator.canShare && navigator.canShare({files})){
-    try{ await navigator.share({files, title:state.client+' \u2014 Field Verification'}); toast('Sent to share sheet'); }
-    catch(e){ if(e.name!=='AbortError') toast('Share failed \u2014 try ZIP'); }
-  } else {
-    toast('Share not supported here \u2014 use ZIP');
+  const t=totals();
+  if(!t.pics){ toast('No photos yet'); return; }
+  toast('Preparing photos\u2026', 60000);
+  try{
+    const list = await buildStamped((n,tot)=>toast(`Preparing ${n} of ${tot}\u2026`, 60000));
+    const files = list.map(x=>new File([x.blob], x.name, {type:'image/jpeg'}));
+    toast('Opening share sheet\u2026');
+    if(navigator.canShare && navigator.canShare({files})){
+      await navigator.share({files, title:state.client+' \u2014 Field Verification'});
+      toast('Sent \u2713');
+    } else {
+      toast('Share not supported \u2014 use ZIP');
+    }
+  }catch(e){
+    if(e.name!=='AbortError') toast('Share failed \u2014 try ZIP');
+    else toast('Cancelled');
   }
 };
 $('btn-zip').onclick=async()=>{
-  const list=buildFileList();
-  if(!list.length){ toast('No photos yet'); return; }
-  toast('Building ZIP\u2026');
+  const t=totals();
+  if(!t.pics){ toast('No photos yet'); return; }
+  toast('Building ZIP\u2026', 60000);
+  const list = await buildStamped((n,tot)=>toast(`Preparing ${n} of ${tot}\u2026`, 60000));
   const zip=new JSZip();
   const folder=zip.folder(sanitize(state.client)+'_03-Photos');
-  list.forEach(x=>folder.file(x.name, x.file));
+  let csv='filename,category,shot,label,gps,timestamp\n';
+  list.forEach(x=>{
+    folder.file(x.name, x.blob);
+    csv+=`"${x.name}","${x.meta.cat}","${x.meta.shot}","${(x.meta.label||'').replace(/"/g,'""')}","${x.meta.gps?x.meta.gps.lat+' '+x.meta.gps.lng:''}","${new Date(x.meta.ts).toISOString()}"\n`;
+  });
+  folder.file('photo-log.csv', csv);
   const blob=await zip.generateAsync({type:'blob'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
@@ -661,10 +711,34 @@ $('btn-zip').onclick=async()=>{
   toast('ZIP downloaded');
 };
 
-/* keep-alive nudge */
-window.addEventListener('beforeunload', e=>{
-  if(totals().pics>0){ e.preventDefault(); e.returnValue=''; }
-});
+/* ================= BOOT / RESTORE ================= */
+async function restoreSession(){
+  const meta = await idb.getMeta('session');
+  if(!meta) return false;
+  state.client=meta.client; state.addr=meta.addr; state.naFlags=meta.naFlags||{};
+  state.photos={};
+  const recs = await idb.allPhotos();
+  recs.forEach(r=>{
+    state.photos[r.shotId]=state.photos[r.shotId]||[];
+    state.photos[r.shotId].push({dbId:r.id, blob:r.blob, url:URL.createObjectURL(r.blob), caption:r.caption, gps:r.gps, ts:r.ts});
+  });
+  renderHome();
+  return true;
+}
+(async function boot(){
+  await openDB();
+  netStatus();
+  const meta = await idb.getMeta('session');
+  const count = meta ? (await idb.allPhotos()).length : 0;
+  if(meta && count>0){
+    $('rc-client').textContent = meta.client;
+    $('rc-stats').textContent = count+' photos saved on this phone';
+    $('resume-card').classList.add('show');
+  }
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+})();
 </script>
 </body>
 </html>
