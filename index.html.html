@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hiner Field Photos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --teal:#2C474A;
+    --teal-deep:#233A3D;
+    --teal-panel:#31504F;
+    --sage:#859981;
+    --bronze:#947056;
+    --bronze-light:#A57C60;
+    --bronze-dark:#6C533F;
+    --limestone:#DCD6C9;
+    --limestone-dim:rgba(220,214,201,.62);
+    --limestone-faint:rgba(220,214,201,.30);
+    --line:rgba(220,214,201,.14);
+    --ok:#9DB894;
+    --grad:linear-gradient(115deg,#A57C60 0%,#6C533F 100%);
+    --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    background:var(--teal-deep);
+    color:var(--limestone);
+    font-family:'Josefin Sans',system-ui,sans-serif;
+    font-weight:300;
+    letter-spacing:.01em;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{max-width:440px;margin:0 auto;min-height:100dvh;background:var(--teal);display:flex;flex-direction:column;position:relative;overflow-x:hidden}
+
+  /* ---------- shared ---------- */
+  .screen{display:none;flex:1;flex-direction:column;animation:fade .25s ease}
+  .screen.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen{animation:none}}
+
+  .topbar{
+    padding:calc(env(safe-area-inset-top,0px) + 16px) 20px 14px;
+    display:flex;align-items:center;gap:12px;
+    border-bottom:1px solid var(--line);
+    background:var(--teal);
+    position:sticky;top:0;z-index:5;
+  }
+  .back{
+    background:none;border:1px solid var(--line);color:var(--limestone);
+    width:38px;height:38px;border-radius:50%;font-size:18px;line-height:1;
+    display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;
+  }
+  .topbar h1{
+    font-size:13px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;flex:1;
+  }
+  .topbar .count{font-size:12px;letter-spacing:.12em;color:var(--bronze-light);font-weight:500}
+
+  .body{padding:20px;flex:1;display:flex;flex-direction:column;gap:16px;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 110px)}
+
+  .btn{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    width:100%;padding:17px 20px;border-radius:var(--radius);
+    font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;
+    letter-spacing:.22em;text-transform:uppercase;cursor:pointer;border:none;
+  }
+  .btn-bronze{background:var(--grad);color:#fff}
+  .btn-ghost{background:none;border:1px solid var(--limestone-faint);color:var(--limestone)}
+  .btn:disabled{opacity:.4}
+  .btn:active{transform:scale(.985)}
+
+  .serif{font-family:'Crimson Text',serif;font-weight:400}
+  .note{
+    font-family:'Crimson Text',serif;font-style:italic;font-size:17px;line-height:1.5;
+    color:var(--limestone-dim);
+  }
+
+  .sticky-cta{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:440px;padding:14px 20px calc(env(safe-area-inset-bottom,0px) + 16px);
+    background:linear-gradient(to top,var(--teal) 65%,rgba(44,71,74,0));
+    z-index:6;
+  }
+
+  /* ---------- leaf mark ---------- */
+  .leaf{display:block}
+  .leaf .fillbase{fill:rgba(220,214,201,.13)}
+
+  /* ---------- setup ---------- */
+  #setup .body{justify-content:flex-start;gap:0;padding-top:12vh}
+  .brand{display:flex;flex-direction:column;align-items:center;gap:18px;margin-bottom:44px}
+  .wordmark{font-size:26px;font-weight:600;letter-spacing:.42em;text-indent:.42em}
+  .wordmark small{display:block;font-size:9.5px;font-weight:400;letter-spacing:.5em;text-indent:.5em;color:var(--limestone-dim);margin-top:7px}
+  .apptag{
+    font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--bronze-light);
+    border:1px solid rgba(165,124,96,.45);padding:8px 16px 6px;border-radius:99px;font-weight:500;
+  }
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--limestone-dim);margin-bottom:9px;font-weight:500}
+  .field input{
+    width:100%;padding:16px;border-radius:var(--radius);border:1px solid var(--line);
+    background:var(--teal-panel);color:var(--limestone);
+    font-family:'Crimson Text',serif;font-size:19px;outline:none;
+  }
+  .field input:focus{border-color:var(--bronze-light)}
+  .setup-note{margin-top:22px;text-align:center;font-size:15px}
+
+  /* ---------- home ---------- */
+  .home-head{display:flex;align-items:center;gap:16px;padding:6px 2px 2px}
+  .home-head .job{flex:1;min-width:0}
+  .home-head .job .client{font-family:'Crimson Text',serif;font-size:23px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .home-head .job .addr{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--limestone-dim);margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .progress-line{display:flex;align-items:baseline;gap:8px;padding:0 2px}
+  .progress-line b{font-size:30px;font-weight:500;color:var(--bronze-light)}
+  .progress-line span{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--limestone-dim)}
+
+  .cat{
+    display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+    background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;cursor:pointer;color:var(--limestone);font-family:inherit;
+  }
+  .cat.done{border-color:rgba(133,153,129,.55)}
+  .cat .num{
+    width:34px;height:34px;border-radius:50%;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--limestone-faint);font-size:12px;font-weight:600;letter-spacing:.05em;
+  }
+  .cat.done .num{background:var(--sage);border-color:var(--sage);color:var(--teal-deep)}
+  .cat .txt{flex:1;min-width:0}
+  .cat .txt .t{font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .cat .txt .s{font-size:12px;color:var(--limestone-dim);margin-top:4px;letter-spacing:.04em}
+  .cat .pics{font-size:12px;color:var(--bronze-light);font-weight:500;letter-spacing:.08em;flex:none}
+
+  .quality{
+    border:1px dashed rgba(165,124,96,.5);border-radius:var(--radius);padding:14px 16px;
+    font-size:12.5px;line-height:1.7;color:var(--limestone-dim);letter-spacing:.05em;
+  }
+  .quality b{color:var(--bronze-light);font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:10.5px;display:block;margin-bottom:5px}
+
+  /* ---------- category ---------- */
+  .cat-note{padding:2px 2px 6px}
+  .shot{
+    background:var(--teal-panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:15px;display:flex;flex-direction:column;gap:12px;
+  }
+  .shot.satisfied{border-color:rgba(133,153,129,.55)}
+  .shot.na{opacity:.55}
+  .shot-head{display:flex;align-items:flex-start;gap:12px}
+  .shot-head .check{
+    width:24px;height:24px;border-radius:50%;border:1.5px solid var(--limestone-faint);
+    flex:none;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:13px;
+  }
+  .shot.satisfied .shot-head .check{background:var(--sage);border-color:var(--sage);color:var(--teal-deep)}
+  .shot-head .txt{flex:1;min-width:0}
+  .shot-head .t{font-size:14.5px;font-weight:500;letter-spacing:.06em;line-height:1.35}
+  .shot-head .tip{font-family:'Crimson Text',serif;font-style:italic;font-size:15px;color:var(--limestone-dim);margin-top:5px;line-height:1.45}
+  .shot-head .min{font-size:10px;letter-spacing:.16em;color:var(--bronze-light);text-transform:uppercase;margin-top:6px;font-weight:500}
+
+  .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .thumb{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:var(--teal-deep)}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .del{
+    position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;
+    background:rgba(35,58,61,.85);color:var(--limestone);border:none;font-size:13px;cursor:pointer;
+  }
+  .thumb .cap-flag{
+    position:absolute;left:0;right:0;bottom:0;padding:3px 6px;font-size:9px;letter-spacing:.1em;
+    background:rgba(35,58,61,.85);color:var(--bronze-light);text-transform:uppercase;font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .thumb .cap-flag.has{color:var(--limestone)}
+
+  .shot-actions{display:flex;gap:10px}
+  .shot-btn{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px;border-radius:11px;font-family:inherit;font-size:11.5px;font-weight:600;
+    letter-spacing:.18em;text-transform:uppercase;cursor:pointer;
+  }
+  .shot-btn.cam{background:var(--grad);border:none;color:#fff}
+  .shot-btn.na-btn{background:none;border:1px solid var(--line);color:var(--limestone-dim);flex:0 0 auto;padding:13px 16px}
+  .shot.na .shot-btn.na-btn{border-color:var(--sage);color:var(--sage)}
+
+  /* caption sheet */
+  .sheet-scrim{position:fixed;inset:0;background:rgba(20,32,34,.7);z-index:20;display:none;align-items:flex-end;justify-content:center}
+  .sheet-scrim.open{display:flex}
+  .sheet{
+    width:100%;max-width:440px;background:var(--teal);border-radius:20px 20px 0 0;
+    padding:22px 20px calc(env(safe-area-inset-bottom,0px) + 22px);
+    display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);
+  }
+  .sheet h3{font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:600}
+  .sheet img{width:100%;border-radius:12px;max-height:38vh;object-fit:cover}
+  .sheet input{
+    width:100%;padding:15px;border-radius:12px;border:1px solid var(--line);
+    background:var(--teal-panel);color:var(--limestone);
+    font-family:'Crimson Text',serif;font-size:18px;outline:none;
+  }
+  .sheet .note{font-size:15px}
+
+  /* ---------- test / export ---------- */
+  .test-quote{
+    font-family:'Crimson Text',serif;font-size:24px;line-height:1.45;text-align:center;
+    padding:10px 8px;
+  }
+  .test-quote .em{color:var(--bronze-light)}
+  .rule{height:1px;background:var(--line);margin:6px 30%}
+  .warnbox{
+    border:1px solid rgba(165,124,96,.5);border-radius:var(--radius);padding:15px 16px;
+    font-size:13px;line-height:1.7;color:var(--limestone-dim);letter-spacing:.04em;
+  }
+  .warnbox b{color:var(--bronze-light)}
+  .export-stat{display:flex;justify-content:space-between;padding:13px 2px;border-bottom:1px solid var(--line);font-size:13px;letter-spacing:.08em}
+  .export-stat span:last-child{color:var(--bronze-light);font-weight:600}
+  .toast{
+    position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 120px);
+    background:var(--limestone);color:var(--teal-deep);padding:12px 20px;border-radius:99px;
+    font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;z-index:40;
+    opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap;
+  }
+  .toast.show{opacity:1}
+  .hidden-input{display:none}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SETUP -->
+  <section class="screen active" id="setup">
+    <div class="body">
+      <div class="brand">
+        <svg class="leaf" width="64" height="80" viewBox="0 0 64 80">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#A57C60"/><stop offset="1" stop-color="#6C533F"/>
+          </linearGradient></defs>
+          <path fill="url(#lg)" d="M32 0C32 0 2 26 2 50a30 30 0 0 0 60 0C62 26 32 0 32 0Zm2 70V16l0 0v54h-4V16c-1 1-2 2-3 3v14l-11-6 0 5 11 6v10l-11-6v5l11 6v13h10V57l11-6v-5l-11 6V42l11-6v-5l-11 6V20c-1-1-2-2-3-3Z" fill-rule="evenodd" clip-rule="evenodd" opacity="0"/>
+          <path fill="url(#lg)" d="M32 1C20 13 4 31 4 50a28 28 0 0 0 56 0C60 31 44 13 32 1Z"/>
+          <g stroke="#2C474A" stroke-width="4" fill="none">
+            <line x1="32" y1="14" x2="32" y2="74"/>
+            <line x1="32" y1="30" x2="18" y2="24"/>
+            <line x1="32" y1="42" x2="18" y2="36"/>
+            <line x1="32" y1="54" x2="18" y2="48"/>
+            <line x1="32" y1="36" x2="46" y2="30"/>
+            <line x1="32" y1="48" x2="46" y2="42"/>
+            <line x1="32" y1="60" x2="46" y2="54"/>
+          </g>
+        </svg>
+        <div class="wordmark">HINER<small>OUTDOOR LIVING</small></div>
+        <div class="apptag">Field Verification Photos</div>
+      </div>
+      <div class="field">
+        <label>Client name</label>
+        <input id="in-client" type="text" placeholder="Paul Taylor" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Property address</label>
+        <input id="in-addr" type="text" placeholder="1234 Broadmoor Bluffs Dr" autocomplete="off">
+      </div>
+      <p class="note setup-note">Could a designer who has never seen this property draw it from your photos alone?<br>That is the standard.</p>
+    </div>
+    <div class="sticky-cta"><button class="btn btn-bronze" id="btn-start">Start the walk</button></div>
+  </section>
+
+  <!-- HOME -->
+  <section class="screen" id="home">
+    <div class="topbar">
+      <svg class="leaf" width="26" height="32" viewBox="0 0 64 80"><path fill="url(#lg)" d="M32 1C20 13 4 31 4 50a28 28 0 0 0 56 0C60 31 44 13 32 1Z"/><g stroke="#2C474A" stroke-width="4" fill="none"><line x1="32" y1="14" x2="32" y2="74"/><line x1="32" y1="30" x2="18" y2="24"/><line x1="32" y1="42" x2="18" y2="36"/><line x1="32" y1="54" x2="18" y2="48"/><line x1="32" y1="36" x2="46" y2="30"/><line x1="32" y1="48" x2="46" y2="42"/><line x1="32" y1="60" x2="46" y2="54"/></g></svg>
+      <h1>Shot List</h1>
+      <span class="count" id="home-count">0 photos</span>
+    </div>
+    <div class="body">
+      <div class="home-head">
+        <div class="job">
+          <div class="client serif" id="home-client">Client</div>
+          <div class="addr" id="home-addr">Address</div>
+        </div>
+      </div>
+      <div class="progress-line"><b id="home-pct">0%</b><span>of shot list covered</span></div>
+      <div id="cat-list"></div>
+      <div class="quality"><b>Every shot</b>Daylight. Landscape orientation. No fingers or shadows over the frame.</div>
+    </div>
+    <div class="sticky-cta"><button class="btn btn-bronze" id="btn-finish">Review &amp; upload</button></div>
+  </section>
+
+  <!-- CATEGORY -->
+  <section class="screen" id="category">
+    <div class="topbar">
+      <button class="back" id="cat-back">‹</button>
+      <h1 id="cat-title">Category</h1>
+      <span class="count" id="cat-count"></span>
+    </div>
+    <div class="body">
+      <p class="note cat-note" id="cat-desc"></p>
+      <div id="shot-list"></div>
+    </div>
+    <div class="sticky-cta"><button class="btn btn-ghost" id="cat-done">Back to shot list</button></div>
+  </section>
+
+  <!-- THE TEST -->
+  <section class="screen" id="test">
+    <div class="topbar">
+      <button class="back" id="test-back">‹</button>
+      <h1>The Test</h1>
+    </div>
+    <div class="body" style="justify-content:center">
+      <p class="test-quote">Could a designer who has <span class="em">never seen this property</span> draw it from your photos alone?</p>
+      <div class="rule"></div>
+      <p class="note" style="text-align:center">If not, keep shooting.<br>There is no such thing as too many photos.</p>
+      <div id="test-gaps"></div>
+    </div>
+    <div class="sticky-cta">
+      <button class="btn btn-ghost" id="btn-keep-shooting" style="margin-bottom:10px">Keep shooting</button>
+      <button class="btn btn-bronze" id="btn-pass">Yes — they could draw it</button>
+    </div>
+  </section>
+
+  <!-- EXPORT -->
+  <section class="screen" id="export">
+    <div class="topbar">
+      <button class="back" id="export-back">‹</button>
+      <h1>Upload</h1>
+    </div>
+    <div class="body">
+      <div>
+        <div class="export-stat"><span>Client</span><span id="ex-client"></span></div>
+        <div class="export-stat"><span>Photos captured</span><span id="ex-count"></span></div>
+        <div class="export-stat"><span>Shot list coverage</span><span id="ex-pct"></span></div>
+      </div>
+      <p class="note">Every photo is renamed with the client, category, and your label — so the file itself says what it is, exactly like the SOP asks.</p>
+      <button class="btn btn-bronze" id="btn-share">Send to Dropbox — 03 Photos</button>
+      <button class="btn btn-ghost" id="btn-zip">Download as ZIP instead</button>
+      <div class="warnbox"><b>How the Dropbox step works:</b> "Send to Dropbox" opens your phone's share sheet. Choose the Dropbox app, then pick the job folder → 03 Photos. Filenames carry the labels, so nothing gets lost in translation.</div>
+      <div class="warnbox">Upload <b>same-day</b>. Phone camera rolls are not a filing system.</div>
+    </div>
+  </section>
+
+  <!-- caption sheet -->
+  <div class="sheet-scrim" id="sheet-scrim">
+    <div class="sheet">
+      <h3>Label this photo</h3>
+      <img id="sheet-img" alt="Captured photo">
+      <input id="sheet-cap" type="text" placeholder="e.g. Valve box, NE corner — or gate width 46 in" autocomplete="off">
+      <p class="note" id="sheet-hint">A photo of a valve box needs a label that says so.</p>
+      <button class="btn btn-bronze" id="sheet-save">Save label</button>
+      <button class="btn btn-ghost" id="sheet-skip">It's obvious — skip</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <input class="hidden-input" id="camera-input" type="file" accept="image/*" capture="environment" multiple>
+</div>
+
+<script>
+/* ================= DATA ================= */
+const CATEGORIES = [
+  {
+    id:'wide', num:'01', title:'Wide Establishing',
+    desc:'Every side of the work area, plus the one that matters most.',
+    shots:[
+      {id:'wide-sides', t:'Work area — every side, multiple angles', tip:'Walk the perimeter. Shoot it from each side before you shoot anything else.', min:4, na:false, labelHint:'e.g. Backyard from SW corner'},
+      {id:'wide-house', t:'The view from the house, looking out', tip:'That\u2019s the view the client buys.', min:1, na:false, labelHint:'e.g. From kitchen slider'},
+    ]
+  },
+  {
+    id:'util', num:'02', title:'Utilities',
+    desc:'Everything a crew will hit, trench near, or tie into. Photograph it or mark it not on property.',
+    shots:[
+      {id:'u-gas', t:'Gas meter', min:1, na:true, labelHint:'Location if not obvious'},
+      {id:'u-elec', t:'Electric meter', min:1, na:true, labelHint:'Location if not obvious'},
+      {id:'u-ac', t:'AC units', min:1, na:true, labelHint:''},
+      {id:'u-spigot', t:'Spigots', min:1, na:true, labelHint:'e.g. Spigot, west wall'},
+      {id:'u-irr', t:'Irrigation heads & valve boxes', tip:'A photo of a valve box needs a label that says so.', min:1, na:true, labelHint:'e.g. Valve box, NE bed'},
+      {id:'u-septic', t:'Septic components', min:1, na:true, labelHint:''},
+      {id:'u-well', t:'Well head', min:1, na:true, labelHint:''},
+      {id:'u-marks', t:'Utility markers or flags', min:1, na:true, labelHint:'e.g. Blue flags along fence'},
+    ]
+  },
+  {
+    id:'exist', num:'03', title:'Existing Features',
+    desc:'Anything staying, going, or being worked around.',
+    shots:[
+      {id:'e-patio', t:'Patios & decks', min:1, na:true, labelHint:''},
+      {id:'e-struct', t:'Structures', min:1, na:true, labelHint:'e.g. Shed, NW corner'},
+      {id:'e-trees', t:'Trees & significant plantings', min:1, na:true, labelHint:''},
+      {id:'e-walls', t:'Walls', min:1, na:true, labelHint:''},
+      {id:'e-water', t:'Water features', min:1, na:true, labelHint:''},
+      {id:'e-other', t:'Anything else staying, going, or in the way', min:1, na:true, labelHint:'Say what it is'},
+    ]
+  },
+  {
+    id:'access', num:'04', title:'Access Points',
+    desc:'How the equipment gets from the street to the work area.',
+    shots:[
+      {id:'a-gates', t:'Gates — with widths', tip:'Measure it. Put the width in the label.', min:1, na:true, labelHint:'e.g. Gate width 46 in'},
+      {id:'a-side', t:'Side yards', min:1, na:true, labelHint:''},
+      {id:'a-path', t:'Equipment path, street to work area', min:1, na:false, labelHint:''},
+      {id:'a-pinch', t:'The tightest pinch point', tip:'The one spot that decides what machine fits.', min:1, na:false, labelHint:'e.g. 38 in between house and fence'},
+    ]
+  },
+  {
+    id:'drain', num:'05', title:'Drainage & Problem Areas',
+    desc:'If it made you pause on site, it goes in the folder.',
+    shots:[
+      {id:'d-spouts', t:'Downspouts', min:1, na:true, labelHint:''},
+      {id:'d-erosion', t:'Erosion or pooling', min:1, na:true, labelHint:'Where and when it pools, if known'},
+      {id:'d-pause', t:'Anything that made you pause', min:1, na:true, labelHint:'Say why it made you pause'},
+    ]
+  },
+  {
+    id:'house', num:'06', title:'The House Itself',
+    desc:'Material and color context for the design.',
+    shots:[
+      {id:'h-facade', t:'Elevation shots — facades facing the work area', tip:'Straight-on, full facade. The designer matches stone and siding to this.', min:2, na:false, labelHint:'e.g. South facade'},
+    ]
+  },
+];
+
+/* ================= STATE ================= */
+const state = {
+  client:'', addr:'',
+  photos:{},   // shotId -> [{file, url, caption}]
+  naFlags:{},  // shotId -> true
+};
+let activeCat = null;
+let pendingShot = null;
+let captionQueue = [];
+
+const $ = id => document.getElementById(id);
+const screens = ['setup','home','category','test','export'];
+function show(id){ screens.forEach(s=>$(s).classList.toggle('active', s===id)); window.scrollTo(0,0); }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+const sanitize = s => (s||'').trim().replace(/[^\w\- ]+/g,'').replace(/\s+/g,'-') || 'Job';
+
+/* ================= PROGRESS ================= */
+function shotPhotos(id){ return state.photos[id]||[]; }
+function shotSatisfied(shot){ return state.naFlags[shot.id] || shotPhotos(shot.id).length >= shot.min; }
+function catStats(cat){
+  const done = cat.shots.filter(shotSatisfied).length;
+  const pics = cat.shots.reduce((n,s)=>n+shotPhotos(s.id).length,0);
+  return {done, total:cat.shots.length, pics, complete: done===cat.shots.length};
+}
+function totals(){
+  let done=0,total=0,pics=0;
+  CATEGORIES.forEach(c=>{const s=catStats(c);done+=s.done;total+=s.total;pics+=s.pics;});
+  return {done,total,pics,pct:Math.round(done/total*100)};
+}
+
+/* ================= RENDER: HOME ================= */
+function renderHome(){
+  $('home-client').textContent = state.client;
+  $('home-addr').textContent = state.addr || '\u2014';
+  const t = totals();
+  $('home-pct').textContent = t.pct+'%';
+  $('home-count').textContent = t.pics+' photo'+(t.pics===1?'':'s');
+  const list = $('cat-list'); list.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    const s = catStats(cat);
+    const el = document.createElement('button');
+    el.className = 'cat'+(s.complete?' done':'');
+    el.innerHTML = `
+      <span class="num">${s.complete?'\u2713':cat.num}</span>
+      <span class="txt">
+        <span class="t">${cat.title}</span>
+        <span class="s">${s.done} of ${s.total} shots covered</span>
+      </span>
+      <span class="pics">${s.pics?s.pics+' \uD83D\uDCF7':''}</span>`;
+    el.onclick = ()=>openCategory(cat.id);
+    el.style.marginBottom='10px';
+    list.appendChild(el);
+  });
+}
+
+/* ================= RENDER: CATEGORY ================= */
+function openCategory(id){
+  activeCat = CATEGORIES.find(c=>c.id===id);
+  renderCategory();
+  show('category');
+}
+function renderCategory(){
+  const cat = activeCat;
+  $('cat-title').textContent = cat.num+' \u2014 '+cat.title;
+  $('cat-desc').textContent = cat.desc;
+  const s = catStats(cat);
+  $('cat-count').textContent = s.done+'/'+s.total;
+  const list = $('shot-list'); list.innerHTML='';
+  cat.shots.forEach(shot=>{
+    const photos = shotPhotos(shot.id);
+    const isNA = !!state.naFlags[shot.id];
+    const sat = shotSatisfied(shot);
+    const div = document.createElement('div');
+    div.className = 'shot'+(sat?' satisfied':'')+(isNA?' na':'');
+    div.style.marginBottom='12px';
+    let thumbs='';
+    if(photos.length){
+      thumbs = '<div class="thumbs">'+photos.map((p,i)=>`
+        <div class="thumb">
+          <img src="${p.url}" alt="">
+          <button class="del" data-shot="${shot.id}" data-i="${i}">\u00d7</button>
+          <div class="cap-flag ${p.caption?'has':''}" data-cap-shot="${shot.id}" data-cap-i="${i}">${p.caption?p.caption:'add label'}</div>
+        </div>`).join('')+'</div>';
+    }
+    div.innerHTML = `
+      <div class="shot-head">
+        <span class="check">${sat?'\u2713':''}</span>
+        <span class="txt">
+          <span class="t">${shot.t}</span>
+          ${shot.tip?`<span class="tip">${shot.tip}</span>`:''}
+          ${shot.min>1?`<span class="min">Minimum ${shot.min} photos</span>`:''}
+        </span>
+      </div>
+      ${thumbs}
+      <div class="shot-actions">
+        <button class="shot-btn cam" data-cam="${shot.id}" ${isNA?'disabled':''}>\uD83D\uDCF7 &nbsp;Take photo${shot.min>1?'s':''}</button>
+        ${shot.na?`<button class="shot-btn na-btn" data-na="${shot.id}">${isNA?'\u2713 N/A':'Not on property'}</button>`:''}
+      </div>`;
+    list.appendChild(div);
+  });
+  // wire
+  list.querySelectorAll('[data-cam]').forEach(b=>b.onclick=()=>startCapture(b.dataset.cam));
+  list.querySelectorAll('[data-na]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.na;
+    if(shotPhotos(id).length){ toast('Delete photos first'); return; }
+    state.naFlags[id]=!state.naFlags[id];
+    renderCategory();
+  });
+  list.querySelectorAll('.del').forEach(b=>b.onclick=()=>{
+    const arr=state.photos[b.dataset.shot];
+    URL.revokeObjectURL(arr[b.dataset.i].url);
+    arr.splice(b.dataset.i,1);
+    renderCategory();
+  });
+  list.querySelectorAll('[data-cap-shot]').forEach(el=>el.onclick=()=>{
+    openCaption(el.dataset.capShot, +el.dataset.capI);
+  });
+}
+
+/* ================= CAPTURE ================= */
+function startCapture(shotId){
+  pendingShot = shotId;
+  $('camera-input').value='';
+  $('camera-input').click();
+}
+$('camera-input').addEventListener('change', e=>{
+  const files=[...e.target.files];
+  if(!files.length || !pendingShot) return;
+  state.photos[pendingShot] = state.photos[pendingShot]||[];
+  captionQueue = [];
+  files.forEach(f=>{
+    const rec = {file:f, url:URL.createObjectURL(f), caption:''};
+    state.photos[pendingShot].push(rec);
+    captionQueue.push({shot:pendingShot, i:state.photos[pendingShot].length-1});
+  });
+  renderCategory(); renderHome();
+  // prompt label for the first new photo (utilities/access matter most)
+  nextCaption();
+});
+function findShot(id){ for(const c of CATEGORIES){ const s=c.shots.find(x=>x.id===id); if(s) return s; } }
+function nextCaption(){
+  const item = captionQueue.shift();
+  if(!item) return;
+  openCaption(item.shot, item.i, true);
+}
+let capTarget=null;
+function openCaption(shotId, i, fromQueue){
+  const p = state.photos[shotId][i]; if(!p) return;
+  capTarget = {shotId, i, fromQueue:!!fromQueue};
+  $('sheet-img').src = p.url;
+  $('sheet-cap').value = p.caption||'';
+  const shot = findShot(shotId);
+  $('sheet-cap').placeholder = shot.labelHint || 'What is this, and where?';
+  $('sheet-hint').textContent = shot.tip || 'Label what isn\u2019t obvious.';
+  $('sheet-scrim').classList.add('open');
+}
+function closeCaption(){
+  $('sheet-scrim').classList.remove('open');
+  const fq = capTarget && capTarget.fromQueue;
+  capTarget=null;
+  renderCategory(); renderHome();
+  if(fq) nextCaption();
+}
+$('sheet-save').onclick=()=>{
+  if(capTarget){ state.photos[capTarget.shotId][capTarget.i].caption = $('sheet-cap').value.trim(); }
+  closeCaption();
+};
+$('sheet-skip').onclick=closeCaption;
+$('sheet-scrim').onclick=e=>{ if(e.target===$('sheet-scrim')) closeCaption(); };
+
+/* ================= FLOW ================= */
+$('btn-start').onclick=()=>{
+  const c=$('in-client').value.trim();
+  if(!c){ toast('Client name first'); $('in-client').focus(); return; }
+  state.client=c; state.addr=$('in-addr').value.trim();
+  renderHome(); show('home');
+};
+$('cat-back').onclick=()=>{ renderHome(); show('home'); };
+$('cat-done').onclick=()=>{ renderHome(); show('home'); };
+$('btn-finish').onclick=()=>{
+  const t=totals();
+  const gaps = [];
+  CATEGORIES.forEach(c=>{ const s=catStats(c); if(!s.complete) gaps.push(c.num+' '+c.title+' \u2014 '+(s.total-s.done)+' shot'+(s.total-s.done===1?'':'s')+' open'); });
+  $('test-gaps').innerHTML = gaps.length
+    ? '<div class="warnbox" style="margin-top:20px"><b>Still open:</b><br>'+gaps.join('<br>')+'</div>'
+    : '';
+  show('test');
+};
+$('test-back').onclick=()=>show('home');
+$('btn-keep-shooting').onclick=()=>show('home');
+$('btn-pass').onclick=()=>{
+  const t=totals();
+  $('ex-client').textContent=state.client;
+  $('ex-count').textContent=t.pics;
+  $('ex-pct').textContent=t.pct+'%';
+  show('export');
+};
+$('export-back').onclick=()=>show('test');
+
+/* ================= EXPORT ================= */
+function buildFileList(){
+  const job = sanitize(state.client);
+  const out=[];
+  CATEGORIES.forEach(cat=>{
+    cat.shots.forEach(shot=>{
+      shotPhotos(shot.id).forEach((p,i)=>{
+        const ext = (p.file.name.match(/\.\w+$/)||['.jpg'])[0];
+        const cap = p.caption ? '_'+sanitize(p.caption) : '';
+        const name = `${job}_${cat.num}-${sanitize(shot.t).slice(0,32)}${cap}_${String(i+1).padStart(2,'0')}${ext}`;
+        out.push({name, file:p.file});
+      });
+    });
+  });
+  return out;
+}
+$('btn-share').onclick=async()=>{
+  const list=buildFileList();
+  if(!list.length){ toast('No photos yet'); return; }
+  const files=list.map(x=>new File([x.file], x.name, {type:x.file.type||'image/jpeg'}));
+  if(navigator.canShare && navigator.canShare({files})){
+    try{ await navigator.share({files, title:state.client+' \u2014 Field Verification'}); toast('Sent to share sheet'); }
+    catch(e){ if(e.name!=='AbortError') toast('Share failed \u2014 try ZIP'); }
+  } else {
+    toast('Share not supported here \u2014 use ZIP');
+  }
+};
+$('btn-zip').onclick=async()=>{
+  const list=buildFileList();
+  if(!list.length){ toast('No photos yet'); return; }
+  toast('Building ZIP\u2026');
+  const zip=new JSZip();
+  const folder=zip.folder(sanitize(state.client)+'_03-Photos');
+  list.forEach(x=>folder.file(x.name, x.file));
+  const blob=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=sanitize(state.client)+'_Field-Photos.zip';
+  a.click();
+  toast('ZIP downloaded');
+};
+
+/* keep-alive nudge */
+window.addEventListener('beforeunload', e=>{
+  if(totals().pics>0){ e.preventDefault(); e.returnValue=''; }
+});
+</script>
+</body>
+</html>
