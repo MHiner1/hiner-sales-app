@@ -270,19 +270,14 @@
 const CATEGORIES = [
   {
     id:'wide', num:'01', title:'Perimeter Walk',
-    desc:'Nine minimum positions. Corners shoot down both property lines and across at the house. Mid-line positions shoot both ways down the line, plus at the house.',
+    desc:'Walk the edge of whatever we\u2019re touching \u2014 the whole lot, just the backyard, whatever the job is. The pattern below matters, not exact spots.',
     map:true,
     shots:[
-      {id:'p1', t:'Position 1 — front corner, driveway side (start here)', tip:'Down each property line, then across the lot at the house.', min:3, na:false, hint:'e.g. From SE corner'},
-      {id:'p2', t:'Position 2 — mid side line', tip:'Both directions along the line, plus straight at the house.', min:3, na:false, hint:''},
-      {id:'p3', t:'Position 3 — back corner', tip:'Down each property line, then across at the house.', min:3, na:false, hint:''},
-      {id:'p4', t:'Position 4 — mid back line', tip:'Both directions along the back line, plus at the rear of the house.', min:3, na:false, hint:''},
-      {id:'p5', t:'Position 5 — back corner, opposite side', tip:'Down each property line, then across at the house.', min:3, na:false, hint:''},
-      {id:'p6', t:'Position 6 — mid side line, opposite side', tip:'Both directions along the line, plus straight at the house.', min:3, na:false, hint:''},
-      {id:'p7', t:'Position 7 — front corner, opposite side', tip:'Down each property line, then across at the house.', min:3, na:false, hint:''},
-      {id:'p8', t:'Position 8 — mid front line', tip:'Both directions along the front, plus at the front of the house.', min:3, na:false, hint:''},
-      {id:'p9', t:'Position 9 — tight zone behind the house', tip:'Stand between the house and anything behind it. Shoot the gap.', min:1, na:true, hint:'e.g. Between house and shed'},
-      {id:'p10', t:'The view from the house, looking out', tip:'That\u2019s the view the client buys.', min:1, na:false, hint:'e.g. From kitchen slider'},
+      {id:'p-corners', t:'From each corner of the work area', tip:'Down both lines, then across at the house. Every corner the property gives you.', min:4, na:false, zoom:true, hint:'e.g. From SE corner'},
+      {id:'p-mids', t:'From the middle of each side', tip:'Both ways along the line, plus straight in at the house.', min:3, na:false, zoom:true, hint:''},
+      {id:'p-square', t:'The house \u2014 straight on', tip:'Square to the facade, from across the yard.', min:1, na:false, zoom:true, hint:'e.g. Rear facade from back fence'},
+      {id:'p-length', t:'The house \u2014 down its length', tip:'Stand off the corner and rake down the house. Front yard and back yard.', min:2, na:false, zoom:true, hint:'e.g. Down east side from backyard'},
+      {id:'p-view', t:'The view from the house, looking out', tip:'That\u2019s the view the client buys.', min:1, na:false, hint:'e.g. From kitchen slider'},
     ]
   },
   {
@@ -340,7 +335,7 @@ const CATEGORIES = [
     id:'house', num:'06', title:'The House Itself',
     desc:'Material and color context. The designer matches every finish to these.',
     shots:[
-      {id:'h-facade', t:'Elevations — facades facing the work area', tip:'Straight-on, full facade.', min:2, na:false, hint:'e.g. South facade'},
+      {id:'h-facade', t:'Elevations — facades facing the work area', tip:'Straight-on, full facade.', min:2, na:false, zoom:true, hint:'e.g. South facade'},
       {id:'h-siding', t:'Siding — close-up', tip:'Close enough to read texture and true color.', min:1, na:false, hint:'e.g. Lap siding, sage green'},
       {id:'h-stone', t:'Stone / masonry accents — close-up', min:1, na:true, hint:'e.g. Ledgestone, entry column'},
       {id:'h-wood', t:'Wood & trim — close-up', min:1, na:true, hint:'e.g. Cedar beams, patio cover'},
@@ -349,21 +344,41 @@ const CATEGORIES = [
   },
 ];
 
-/* ================= LOT MAP SVG ================= */
+/* ================= PATTERN DIAGRAM SVG ================= */
 const LOT_MAP = `
-<svg viewBox="0 0 340 300">
-  <rect x="30" y="20" width="280" height="250" fill="none" stroke="rgba(220,214,201,.35)" stroke-width="1.5" stroke-dasharray="5 4"/>
-  <rect x="105" y="105" width="150" height="80" fill="rgba(220,214,201,.10)" stroke="rgba(220,214,201,.4)" stroke-width="1.5"/>
-  <text x="180" y="151" text-anchor="middle" fill="rgba(220,214,201,.65)" font-size="12" letter-spacing="2" font-family="Josefin Sans,sans-serif">HOUSE</text>
-  <rect x="195" y="185" width="42" height="85" fill="rgba(220,214,201,.06)" stroke="rgba(220,214,201,.25)" stroke-width="1"/>
-  <text x="216" y="240" text-anchor="middle" fill="rgba(220,214,201,.45)" font-size="8" letter-spacing="1.5" font-family="Josefin Sans,sans-serif" transform="rotate(-90 216 235)">DRIVEWAY</text>
-  <rect x="222" y="72" width="30" height="26" fill="none" stroke="rgba(220,214,201,.25)" stroke-width="1"/>
-  ${[
-    [285,255,'1'],[295,145,'2'],[295,35,'3'],[170,28,'4'],[42,35,'5'],[42,145,'6'],[42,255,'7'],[150,262,'8'],[236,92,'9']
-  ].map(([x,y,n])=>`
-    <circle cx="${x}" cy="${y}" r="12" fill="#A57C60"/>
-    <text x="${x}" y="${y+4}" text-anchor="middle" fill="#fff" font-size="11" font-weight="600" font-family="Josefin Sans,sans-serif">${n}</text>`).join('')}
-  <text x="285" y="288" text-anchor="middle" fill="rgba(165,124,96,.9)" font-size="8.5" letter-spacing="1.5" font-family="Josefin Sans,sans-serif">START</text>
+<svg viewBox="0 0 340 290">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#A57C60"/>
+    </marker>
+  </defs>
+  <rect x="30" y="20" width="280" height="230" fill="none" stroke="rgba(220,214,201,.35)" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <rect x="110" y="95" width="140" height="75" fill="rgba(220,214,201,.10)" stroke="rgba(220,214,201,.4)" stroke-width="1.5"/>
+  <text x="180" y="138" text-anchor="middle" fill="rgba(220,214,201,.65)" font-size="12" letter-spacing="2" font-family="Josefin Sans,sans-serif">HOUSE</text>
+
+  <!-- corner position: down both lines + across at house -->
+  <circle cx="292" cy="242" r="9" fill="#A57C60"/>
+  <line x1="292" y1="228" x2="292" y2="176" stroke="#A57C60" stroke-width="2.5" marker-end="url(#ah)"/>
+  <line x1="278" y1="242" x2="216" y2="242" stroke="#A57C60" stroke-width="2.5" marker-end="url(#ah)"/>
+  <line x1="283" y1="231" x2="242" y2="181" stroke="#A57C60" stroke-width="2.5" marker-end="url(#ah)"/>
+  <text x="292" y="272" text-anchor="middle" fill="rgba(165,124,96,.95)" font-size="9" letter-spacing="1.5" font-family="Josefin Sans,sans-serif">CORNERS</text>
+
+  <!-- mid-line position: both ways + straight in -->
+  <circle cx="38" cy="132" r="9" fill="#A57C60"/>
+  <line x1="38" y1="118" x2="38" y2="66" stroke="#A57C60" stroke-width="2.5" marker-end="url(#ah)"/>
+  <line x1="38" y1="146" x2="38" y2="198" stroke="#A57C60" stroke-width="2.5" marker-end="url(#ah)"/>
+  <line x1="52" y1="132" x2="98" y2="132" stroke="#A57C60" stroke-width="2.5" marker-end="url(#ah)"/>
+  <text x="42" y="272" text-anchor="middle" fill="rgba(165,124,96,.95)" font-size="9" letter-spacing="1.5" font-family="Josefin Sans,sans-serif">MID-LINES</text>
+
+  <!-- down the length of the house -->
+  <circle cx="88" cy="44" r="9" fill="#859981"/>
+  <line x1="99" y1="52" x2="228" y2="115" stroke="#859981" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+  <text x="130" y="272" text-anchor="middle" fill="rgba(133,153,129,.95)" font-size="9" letter-spacing="1.5" font-family="Josefin Sans,sans-serif">DOWN ITS LENGTH</text>
+
+  <!-- straight on at house -->
+  <circle cx="180" cy="228" r="9" fill="#859981"/>
+  <line x1="180" y1="214" x2="180" y2="178" stroke="#859981" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+  <text x="238" y="272" text-anchor="middle" fill="rgba(133,153,129,.95)" font-size="9" letter-spacing="1.5" font-family="Josefin Sans,sans-serif">STRAIGHT ON</text>
 </svg>`;
 
 /* ================= STATE + INDEXEDDB ================= */
@@ -464,7 +479,7 @@ function renderCategory(){
   const cat = activeCat;
   $('cat-title').textContent = cat.num+' \u2014 '+cat.title;
   $('cat-desc').textContent = cat.desc;
-  $('cat-map').innerHTML = cat.map ? `<div class="lot-map"><div class="lm-t">Minimum positions — adapt to the lot</div>${LOT_MAP}</div>` : '';
+  $('cat-map').innerHTML = cat.map ? `<div class="lot-map"><div class="lm-t">The pattern — repeat it around whatever we\u2019re touching</div>${LOT_MAP}</div>` : '';
   const s = catStats(cat);
   $('cat-count').textContent = s.done+'/'+s.total;
   const list = $('shot-list'); list.innerHTML='';
@@ -491,6 +506,7 @@ function renderCategory(){
           <span class="t">${shot.t}</span>
           ${shot.tip?`<span class="tip">${shot.tip}</span>`:''}
           ${shot.min>1?`<span class="min">Minimum ${shot.min} photos</span>`:''}
+          ${shot.zoom?`<span class="min">Tap .5\u00d7 on the camera</span>`:''}
         </span>
       </div>
       ${thumbs}
